@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="moneyapp" basedir="." default="build">
+<project name="mongo-object-map" basedir="." default="build">
 	<property file="${user.home}/.ant/build.properties" />
 	<property file="build.properties" />
 	<property file="build.properties-sample" />
@@ -49,7 +49,8 @@
 	</easyget>
 </target>
 
-<target name="build" depends="prepare" description="Compile main source tree java files">
+<target name="build" depends="jars,prepare" description="Compile main source tree java files">
+	<mkdir dir="${lib.dir}" />
 	<javac destdir="${build.dir}" debug="true" target="1.5" deprecation="false" optimize="false" failonerror="true" includeantruntime="false">
 		<compilerarg value="-Xlint:unchecked" />
 		<src path="${src.dir}" />
