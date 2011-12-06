@@ -27,6 +27,7 @@
 	<target name="prepare" description="Copies files to build directory">
 		<mkdir dir="${src.dir}" />
 		<mkdir dir="${build.dir}" />
+		<mkdir dir="${lib.dir}" />
 
 		<!-- copy files in src to classes directory -->
 		<copy todir="${build.dir}">

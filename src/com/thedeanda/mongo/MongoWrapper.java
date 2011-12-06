@@ -12,11 +12,13 @@ abstract public class MongoWrapper {
 	private Mongo mongo;
 	private DB db;
 
-	public MongoWrapper(String host, int port, String db) throws UnknownHostException,
-			MongoException {
+	public MongoWrapper(String host, int port, String db)
+			throws UnknownHostException, MongoException {
 		MongoOptions options = new MongoOptions();
 		options.autoConnectRetry = true;
 		options.connectTimeout = 5000;
+		options.maxWaitTime = 5000;
+		options.socketTimeout = 5000;
 
 		this.mongo = new Mongo(new ServerAddress(host, port), options);
 
