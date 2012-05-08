@@ -17,6 +17,8 @@ public class MongoWrapper {
 		MongoOptions options = new MongoOptions();
 		options.autoConnectRetry = true;
 		options.connectTimeout = 5000;
+		options.maxWaitTime = 5000;
+		options.socketTimeout = 5000;
 
 		this.mongo = new Mongo(new ServerAddress(host, port), options);
 
