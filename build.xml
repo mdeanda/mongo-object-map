@@ -87,7 +87,7 @@
 			<include name="*.jar" />
 		</fileset>
 	</copy>
-	<jar destfile="${dist.dir}/${ant.project.name}.jar" basedir="${build.dir}" />
+	<jar destfile="${dist.dir}/${ant.project.name}-${dist.version}.jar" basedir="${build.dir}" />
 
 	<!-- create binary archive -->
 	<tar destfile="${dist.dir}/${ant.project.name}-${dist.version}.tar.gz">

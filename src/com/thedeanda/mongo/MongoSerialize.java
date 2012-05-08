@@ -34,16 +34,23 @@ public class MongoSerialize {
 			StoredField sf = fld.getAnnotation(StoredField.class);
 			StoredIdField sif = fld.getAnnotation(StoredIdField.class);
 			StoredDateField sdf = fld.getAnnotation(StoredDateField.class);
+			StoredEnumField sef = fld.getAnnotation(StoredEnumField.class);
 
 			if (sif != null && "id".equals(name)) {
 				name = "_id";
 			}
 			Object value = d.get(name);
 			try {
-				if (sdf != null && value != null) {
+				if (sef != null && value != null) {
+					fld.set(toObject, getEnumFromValue(fld, sef, value));
+				} else if (sdf != null && value != null) {
 					fld.set(toObject, value);
 				} else if (sif != null && value != null) {
-					fld.set(toObject, value.toString());
+					if (value instanceof ObjectId
+							&& fld.getType() == ObjectId.class)
+						fld.set(toObject, value);
+					else
+						fld.set(toObject, value.toString());
 				} else if (sf != null && value != null) {
 					Class<?> fldClass = getClassFromName(fld.getType()
 							.getCanonicalName());
@@ -58,6 +65,10 @@ public class MongoSerialize {
 			} catch (IllegalArgumentException e) {
 				log.error(e.getMessage(), e);
 			} catch (IllegalAccessException e) {
+				log.error(e.getMessage(), e);
+			} catch (SecurityException e) {
+				log.error(e.getMessage(), e);
+			} catch (NoSuchFieldException e) {
 				log.error(e.getMessage(), e);
 			} finally {
 				fld.setAccessible(a);
@@ -97,6 +108,9 @@ public class MongoSerialize {
 				boolean sf = fld.getAnnotation(StoredField.class) != null;
 				boolean sif = fld.getAnnotation(StoredIdField.class) != null;
 				boolean sdf = fld.getAnnotation(StoredDateField.class) != null;
+				StoredEnumField sefAnot = fld
+						.getAnnotation(StoredEnumField.class);
+				boolean sef = sefAnot != null;
 
 				if (!isAcceptableClass(fld.getDeclaringClass()))
 					throw new ClassCastException(
@@ -109,7 +123,10 @@ public class MongoSerialize {
 				if (value != null && sdf) {
 					ret.put(name, value);
 				} else if (value != null && sif) {
-					ret.put(name, new ObjectId(String.valueOf(value)));
+					if (value instanceof ObjectId)
+						ret.put(name, value);
+					else
+						ret.put(name, new ObjectId(String.valueOf(value)));
 				} else if (value != null && sf) {
 					// check if simple class to use string
 					if (isSimpleClass(value.getClass())) {
@@ -117,16 +134,60 @@ public class MongoSerialize {
 					} else {
 						ret.put(name, serialize(value));
 					}
-				} else if (sf || sif || sdf) {
+				} else if (value != null && sef) {
+					ret.put(name, enumValue(sefAnot, fld, ret, value));
+				} else if (sf || sif || sdf || sef) {
 					ret.put(name, null);
 				}
 			} catch (IllegalArgumentException e) {
 				log.error(e.getMessage(), e);
 			} catch (IllegalAccessException e) {
 				log.error(e.getMessage(), e);
+			} catch (SecurityException e) {
+				log.error(e.getMessage(), e);
+			} catch (NoSuchFieldException e) {
+				log.error(e.getMessage(), e);
 			}
 		}
 		return ret;
+	}
+
+	private Object getEnumFromValue(Field fld, StoredEnumField sef, Object value)
+			throws IllegalArgumentException, IllegalAccessException,
+			SecurityException, NoSuchFieldException {
+		Object retVal = null;
+		Class<?> enumClass = fld.getType();
+		Object[] enums = enumClass.getEnumConstants();
+		if (enums != null) {
+			Field enumField = enumClass.getDeclaredField(sef.value());
+			boolean acc = enumField.isAccessible();
+			enumField.setAccessible(true);
+			for (Object o : enums) {
+				Object val = enumField.get(o);
+				if (val.equals(value)) {
+					retVal = o;
+					break;
+				}
+			}
+			enumField.setAccessible(acc);
+		}
+		return retVal;
+	}
+
+	private Object enumValue(StoredEnumField sefAnot, Field fld,
+			BasicDBObject ret, Object value) throws SecurityException,
+			NoSuchFieldException, IllegalArgumentException,
+			IllegalAccessException {
+		@SuppressWarnings("unused")
+		Field[] tmp = fld.getClass().getEnumConstants();
+
+		Field enumField = value.getClass().getDeclaredField(sefAnot.value());
+		boolean acc = enumField.isAccessible();
+		enumField.setAccessible(true);
+		Object valueToStore = enumField.get(value);
+		enumField.setAccessible(acc);
+
+		return valueToStore;
 	}
 
 	private boolean isAcceptableClass(Class<?> cls) {
@@ -150,20 +211,28 @@ public class MongoSerialize {
 	}
 
 	private Set<Field> getFieldMap(Class<? extends Object> cls) {
-		if (!cache.containsKey(cls)) {
-			Field[] flds = cls.getDeclaredFields();
+		Class<? extends Object> key = cls;
+		if (!cache.containsKey(key)) {
 			Set<Field> fields = new HashSet<Field>();
 
-			for (Field fld : flds) {
-				if (fld.isAnnotationPresent(StoredField.class)
-						|| fld.isAnnotationPresent(StoredIdField.class)
-						|| fld.isAnnotationPresent(StoredDateField.class)) {
-					fields.add(fld);
+			while (cls != null) {
+				Field[] flds = cls.getDeclaredFields();
+				for (Field fld : flds) {
+					if (fld.isAnnotationPresent(StoredField.class)
+							// /||
+							// fld.isAnnotationPresent(StoredEnumField.class)
+							|| fld.isAnnotationPresent(StoredIdField.class)
+							|| fld.isAnnotationPresent(StoredDateField.class)) {
+						fields.add(fld);
+					}
+					if (fld.isAnnotationPresent(StoredEnumField.class)) {
+						fields.add(fld);
+					}
 				}
+				cls = cls.getSuperclass();
 			}
-
-			cache.put(cls, fields);
+			cache.put(key, fields);
 		}
-		return cache.get(cls);
+		return cache.get(key);
 	}
 }

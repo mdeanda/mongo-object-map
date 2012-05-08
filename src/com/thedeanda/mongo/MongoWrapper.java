@@ -8,12 +8,12 @@ import com.mongodb.MongoException;
 import com.mongodb.MongoOptions;
 import com.mongodb.ServerAddress;
 
-abstract public class MongoWrapper {
+public class MongoWrapper {
 	private Mongo mongo;
 	private DB db;
 
-	public MongoWrapper(String host, int port, String db) throws UnknownHostException,
-			MongoException {
+	public MongoWrapper(String host, int port, String db)
+			throws UnknownHostException, MongoException {
 		MongoOptions options = new MongoOptions();
 		options.autoConnectRetry = true;
 		options.connectTimeout = 5000;
@@ -21,12 +21,9 @@ abstract public class MongoWrapper {
 		this.mongo = new Mongo(new ServerAddress(host, port), options);
 
 		this.db = mongo.getDB(db);
-		init();
 	}
 
-	abstract protected void init();
-
-	protected DB getDb() {
+	public DB getDb() {
 		return db;
 	};
 
