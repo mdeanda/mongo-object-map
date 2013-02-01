@@ -112,9 +112,14 @@ public class MongoSerialize {
 						.getAnnotation(StoredEnumField.class);
 				boolean sef = sefAnot != null;
 
-				if (!isAcceptableClass(fld.getDeclaringClass()))
+				if (!isAcceptableClass(fld.getDeclaringClass())) {
+					log.error(fld.getName()
+							+ " "
+							+ fld.getDeclaringClass().getClass()
+									.getCanonicalName());
 					throw new ClassCastException(
 							"Class must be concrete and not abstract or interface");
+				}
 
 				String name = fld.getName();
 				if (sif && "id".equals(name)) {
@@ -191,10 +196,13 @@ public class MongoSerialize {
 	}
 
 	private boolean isAcceptableClass(Class<?> cls) {
+		/*
 		if (cls.isInterface() || Modifier.isAbstract(cls.getModifiers()))
 			return false;
 		else
 			return true;
+			*/
+		return true;
 	}
 
 	private boolean isSimpleClass(Class<? extends Object> cls) {
