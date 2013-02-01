@@ -9,7 +9,7 @@
 	<property name="lib.dir" value="lib" />
 	<property name="src.dir" value="src" />
 	<property name="build.dir" value="bin" />
-	<property name="dist.version" value="0.1" />
+	<property name="dist.version" value="0.2" />
 
 	<path id="classpath">
 		<fileset dir="${lib.dir}">
