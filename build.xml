@@ -9,7 +9,6 @@
 	<property name="lib.dir" value="lib" />
 	<property name="src.dir" value="src" />
 	<property name="build.dir" value="bin" />
-	<property name="dist.version" value="0.2" />
 
 	<path id="classpath">
 		<fileset dir="${lib.dir}">
@@ -18,6 +17,10 @@
 		<pathelement path="${build.dir}" />
 	</path>
 
+	<tstamp>
+		<format property="TS" pattern="YYYY-MM-dd"/>
+	</tstamp>
+	
 	<target name="clean" description="Clean">
 		<delete dir="${build.dir}" />
 		<delete dir="${lib.dir}" />
@@ -36,69 +39,74 @@
 			</fileset>
 		</copy>
 
-</target>
-
-<target name="jars" depends="prepare">
-	<taskdef name="easyget" classname="net.sf.easygettask.EasyGet" classpath="${dist.dir}/easygettask.jar" />
-
-	<mkdir dir="${lib.dir}" />
-
-	<easyget dest="${lib.dir}">
-		<mirror url="http://mini.mymetropolist.com/javalibs" />
-		<get path="org/mongodb" file="mongo-2.3.jar" />
-		<get path="org/apache/log4j" file="log4j-1.2.14.jar" />
-	</easyget>
-</target>
-
-<target name="build" depends="jars,prepare" description="Compile main source tree java files">
-	<mkdir dir="${lib.dir}" />
-	<javac destdir="${build.dir}" debug="true" target="1.5" deprecation="false" optimize="false" failonerror="true" includeantruntime="false">
-		<compilerarg value="-Xlint:unchecked" />
-		<src path="${src.dir}" />
-		<classpath refid="classpath" />
-	</javac>
-</target>
-
-<target name="javadoc" description="Builds javadocs">
-	<mkdir dir="${doc.dir}" />
-	<javadoc sourcepath="${src.dir}" destdir="${doc.dir}" author="true" version="true" use="true">
-		<classpath refid="classpath" />
-		<packageset dir="${src.dir}">
-			<include name="com/thedeanda/**" />
-		</packageset>
-	</javadoc>
-</target>
-
-<target name="dist" depends="clean, build" description="Builds jar file">
-	<mkdir dir="${dist.dir}" />
-
-	<!-- make src archive -->
-	<tar destfile="${dist.dir}/${ant.project.name}-src-${dist.version}.tar.gz">
-		<tarfileset dir="." prefix="${ant.project.name}-src-${dist.version}">
-			<exclude name="*.svn" />
-			<exclude name="${build.dir}" />
-			<exclude name="${dist.dir}" />
-		</tarfileset>
-	</tar>
-
-	<!-- copy dist files to build folder -->
-	<mkdir dir="${dist.dir}/build/lib" />
-	<copy todir="${dist.dir}/build/lib/">
-		<fileset dir="${lib.dir}">
-			<include name="*.jar" />
-		</fileset>
-	</copy>
-	<jar destfile="${dist.dir}/${ant.project.name}-${dist.version}.jar" basedir="${build.dir}" />
-
-	<!-- create binary archive -->
-	<tar destfile="${dist.dir}/${ant.project.name}-${dist.version}.tar.gz">
-		<tarfileset dir="${dist.dir}/build" prefix="${ant.project.name}-${dist.version}">
-			<exclude name="*.svn" />
-		</tarfileset>
-	</tar>
-
-	<zip destfile="${dist.dir}/${ant.project.name}-${dist.version}.zip" basedir="${dist.dir}/build" excludes="*.svn" />
-</target>
-
+	</target>
+	
+	<target name="jars" depends="prepare">
+		<taskdef name="easyget" classname="net.sf.easygettask.EasyGet" classpath="${dist.dir}/easygettask.jar" />
+	
+		<mkdir dir="${lib.dir}" />
+	
+		<easyget dest="${lib.dir}">
+			<mirror url="http://jars.thedeanda.com" />
+			
+			<get path="org/mongodb" file="mongo-java-driver-2.11.3.jar" />
+			<get path="org/slf4j/1.7.5" file="slf4j-api-1.7.5.jar" />
+			<get path="org/slf4j/1.7.5" file="slf4j-simple-1.7.5.jar" />
+			<get path="com/hazelcast/3.1" file="hazelcast-all-3.1.jar"/>
+			<get path="org/apache/commons-io" file="commons-io-2.4.jar" />
+			<get path="org/apache/commons-lang" file="commons-lang3-3.1.jar" />
+	
+		</easyget>
+	</target>
+	
+	<target name="build" depends="jars,prepare" description="Compile main source tree java files">
+		<mkdir dir="${lib.dir}" />
+		<javac destdir="${build.dir}" debug="true" target="1.5" deprecation="false" optimize="false" failonerror="true" includeantruntime="false">
+			<compilerarg value="-Xlint:unchecked" />
+			<src path="${src.dir}" />
+			<classpath refid="classpath" />
+		</javac>
+	</target>
+	
+	<target name="javadoc" description="Builds javadocs">
+		<mkdir dir="${doc.dir}" />
+		<javadoc sourcepath="${src.dir}" destdir="${doc.dir}" author="true" version="true" use="true">
+			<classpath refid="classpath" />
+			<packageset dir="${src.dir}">
+				<include name="com/thedeanda/**" />
+			</packageset>
+		</javadoc>
+	</target>
+	
+	<target name="dist" depends="clean, build" description="Builds jar file">
+		<mkdir dir="${dist.dir}" />
+	
+		<!-- make src archive -->
+		<tar destfile="${dist.dir}/${ant.project.name}-src-${TS}.tar.gz">
+			<tarfileset dir="." prefix="${ant.project.name}-src-${TS}">
+				<exclude name="*.svn" />
+				<exclude name="${build.dir}" />
+				<exclude name="${dist.dir}" />
+			</tarfileset>
+		</tar>
+	
+		<!-- copy dist files to build folder -->
+		<mkdir dir="${dist.dir}/build/lib" />
+		<copy todir="${dist.dir}/build/lib/">
+			<fileset dir="${lib.dir}">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+		<jar destfile="${dist.dir}/${ant.project.name}-${TS}.jar" basedir="${build.dir}" />
+	
+		<!-- create binary archive -->
+		<tar destfile="${dist.dir}/${ant.project.name}-${TS}.tar.gz">
+			<tarfileset dir="${dist.dir}/build" prefix="${ant.project.name}-${TS}">
+				<exclude name="*.svn" />
+			</tarfileset>
+		</tar>
+	
+		<zip destfile="${dist.dir}/${ant.project.name}-${TS}.zip" basedir="${dist.dir}/build" excludes="*.svn" />
+	</target>
 
 </project>

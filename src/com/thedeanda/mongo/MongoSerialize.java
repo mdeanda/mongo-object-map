@@ -1,19 +1,20 @@
 package com.thedeanda.mongo;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mongodb.BasicDBObject;
 
 public class MongoSerialize {
-	private static final Logger log = Logger.getLogger(MongoSerialize.class);
+	private static final Logger log = LoggerFactory
+			.getLogger(MongoSerialize.class);
 
 	private Map<Class<? extends Object>, Set<Field>> cache = new HashMap<Class<? extends Object>, Set<Field>>();
 
@@ -55,7 +56,7 @@ public class MongoSerialize {
 					Class<?> fldClass = getClassFromName(fld.getType()
 							.getCanonicalName());
 					if (isSimpleClass(fldClass)) {
-						fld.set(toObject, value);
+						fld.set(toObject, convert(fldClass, value));
 					} else {
 						Object toObject2 = fldClass.newInstance();
 						deserialize((BasicDBObject) value, toObject2);
@@ -74,6 +75,29 @@ public class MongoSerialize {
 				fld.setAccessible(a);
 			}
 		}
+	}
+
+	private Object convert(Class<? extends Object> cls, Object value) {
+		Object ret = null;
+		if (!cls.isAssignableFrom(value.getClass())) {
+			if (cls.isAssignableFrom(Double.class)) {
+				ret = ((Number) value).doubleValue();
+			}
+			if (cls.isAssignableFrom(Long.class)) {
+				ret = ((Number) value).longValue();
+			}
+			if (cls.isAssignableFrom(Integer.class)) {
+				ret = ((Number) value).intValue();
+			}
+			if (cls.isAssignableFrom(Float.class)) {
+				ret = ((Number) value).floatValue();
+			}
+		}
+		if (ret == null) {
+			ret = value;
+		}
+
+		return ret;
 	}
 
 	private Class<? extends Object> getClassFromName(String name) {
@@ -197,11 +221,9 @@ public class MongoSerialize {
 
 	private boolean isAcceptableClass(Class<?> cls) {
 		/*
-		if (cls.isInterface() || Modifier.isAbstract(cls.getModifiers()))
-			return false;
-		else
-			return true;
-			*/
+		 * if (cls.isInterface() || Modifier.isAbstract(cls.getModifiers()))
+		 * return false; else return true;
+		 */
 		return true;
 	}
 

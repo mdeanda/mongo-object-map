@@ -18,7 +18,10 @@ public class TestCarSerialization {
 
 	@Before
 	public void prepare() throws Exception {
-		this.mw = new MongoWrapper("localhost", 27017, "test");
+		this.mw = new MongoWrapper();
+		mw.setServers("localhost:27017");
+		mw.setDbName("test");
+		mw.init();
 		this.col = mw.getDb().getCollection("test");
 	}
 
