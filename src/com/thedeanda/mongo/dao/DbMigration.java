@@ -23,18 +23,18 @@ import com.mongodb.DBCollection;
  * 
  */
 public class DbMigration {
-	private static final String VERSION_COL = "dbversion";
 	private static final ObjectId VERSION_ID = new ObjectId(0, 0, 0);
 	private static final String VERSION_FIELD = "version";
-	private static final String RESOURCE_BASE = "/dbmigration/";
 	private static final String RESOURCE_EXTENSION = ".js";
 
 	private static final Logger log = LoggerFactory
 			.getLogger(DbMigration.class);
+	private String versionCollectionName;
 	private DB db;
+	private String resourceBase;
 
-	public DbMigration(DB db) {
-		this.db = db;
+	public DbMigration() {
+
 	}
 
 	public void run() throws Exception {
@@ -73,13 +73,13 @@ public class DbMigration {
 		BasicDBObject obj = new BasicDBObject("_id", VERSION_ID);
 		obj.put(VERSION_FIELD, version);
 
-		DBCollection col = db.getCollection(VERSION_COL);
+		DBCollection col = db.getCollection(versionCollectionName);
 		col.save(obj);
 	}
 
 	private int getVersion() {
 		int version = 0;
-		DBCollection col = db.getCollection(VERSION_COL);
+		DBCollection col = db.getCollection(versionCollectionName);
 
 		BasicDBObject obj = (BasicDBObject) col.findOne(new BasicDBObject(
 				"_id", VERSION_ID));
@@ -91,7 +91,7 @@ public class DbMigration {
 
 	private String loadVersionFile(int version) {
 		InputStream is = getClass().getResourceAsStream(
-				RESOURCE_BASE + version + RESOURCE_EXTENSION);
+				resourceBase + version + RESOURCE_EXTENSION);
 		StringWriter output = new StringWriter();
 		try {
 			if (is != null) {
@@ -102,5 +102,29 @@ public class DbMigration {
 			log.error(e.getMessage(), e);
 		}
 		return null;
+	}
+
+	public String getVersionCollectionName() {
+		return versionCollectionName;
+	}
+
+	public void setVersionCollectionName(String versionCollectionName) {
+		this.versionCollectionName = versionCollectionName;
+	}
+
+	public DB getDb() {
+		return db;
+	}
+
+	public void setDb(DB db) {
+		this.db = db;
+	}
+
+	public String getResourceBase() {
+		return resourceBase;
+	}
+
+	public void setResourceBase(String resourceBase) {
+		this.resourceBase = resourceBase;
 	}
 }
