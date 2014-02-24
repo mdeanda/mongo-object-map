@@ -61,7 +61,7 @@
 	
 	<target name="build" depends="jars,prepare" description="Compile main source tree java files">
 		<mkdir dir="${lib.dir}" />
-		<javac destdir="${build.dir}" debug="true" target="1.5" deprecation="false" optimize="false" failonerror="true" includeantruntime="false">
+		<javac destdir="${build.dir}" debug="true" deprecation="false" optimize="false" failonerror="true" includeantruntime="false">
 			<compilerarg value="-Xlint:unchecked" />
 			<src path="${src.dir}" />
 			<classpath refid="classpath" />
