@@ -5,8 +5,10 @@ apply plugin: 'eclipse'
 group = 'com.thedeanda'
 version = '1.0-SNAPSHOT'
 
-description = """servlettools"""
+description = """mongo-object-map"""
 
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 repositories {
 	mavenCentral()
