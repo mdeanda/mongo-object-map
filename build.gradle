@@ -16,7 +16,7 @@ apply plugin: 'eclipse'
 apply plugin: 'com.jfrog.artifactory-upload'
 
 group = 'com.thedeanda'
-version = '1.0'
+version = '1.0.1-SNAPSHOT'
 
 description = "mongo-object-map"
 
