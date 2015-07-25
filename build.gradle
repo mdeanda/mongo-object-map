@@ -10,14 +10,18 @@ buildscript {
 		}
 	}
 }
-apply plugin: 'java'
+
 apply plugin: 'maven'
+apply plugin: 'java'
+apply plugin: 'jacoco'
 apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.artifactory-upload'
+apply plugin: 'pmd'
+apply plugin: 'findbugs'
 
 group = 'com.thedeanda'
-version = '1.0.1-SNAPSHOT'
-
+version = '1.1'
 description = "mongo-object-map"
 
 sourceCompatibility = 1.7
@@ -25,15 +29,21 @@ targetCompatibility = 1.7
 
 repositories {
 	mavenCentral()
+	mavenLocal()
 }
-dependencies {
-	compile group: 'org.slf4j', name: 'slf4j-api', version:'1.+'
-	compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.+'
-	compile group: 'commons-io', name: 'commons-io', version:'2.+'
-	compile group: 'com.hazelcast', name: 'hazelcast-all', version: '3.+'
-	compile group: 'org.mongodb', name: 'mongo-java-driver', version: '2.+'
-	testCompile group: 'junit', name: 'junit', version:'4.+'
-	testCompile group: 'org.slf4j', name: 'slf4j-simple', version:'1.+'
+configurations {
+	published
+}
+task sourceJar(type: Jar) {
+	from sourceSets.main.allSource
+	classifier = 'sources'
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
+artifactoryPublish {
+	dependsOn sourceJar, javadocJar
 }
 artifactory {
 	contextUrl = "${artifactory_contextUrl}"
@@ -63,4 +73,62 @@ artifactory {
 		}
 	}
 
+}
+jacocoTestReport {
+	reports {
+		xml.enabled false
+		csv.enabled false
+		html.destination "${buildDir}/jacocoHtml"
+	}
+}
+pmd {
+	ignoreFailures = true
+	reportsDir = file('build/docs/pmd')
+}
+findbugs {
+	ignoreFailures = true
+	reportsDir = file('build/docs/findbugs')
+	toolVersion = '3.0.1'
+}
+findbugsMain {
+	reports {
+		xml.enabled = false
+		html.enabled = true
+	}
+}
+task copyCoverageReport(type: Copy) {
+	from 'build/jacocoHtml'
+	into 'build/docs/jacoco'
+}
+copyCoverageReport.dependsOn jacocoTestReport
+
+task copyTest(type: Copy) {
+	from 'build/reports/tests'
+	into 'build/docs/tests'
+}
+copyTest.dependsOn test
+
+task docJar(type: Jar) {
+	classifier = 'doc'
+	from 'build/docs'
+}
+docJar.dependsOn javadoc, copyTest, copyCoverageReport, check
+artifactoryPublish {
+	dependsOn docJar
+}
+artifacts {
+	//published sourceJar
+	//published javadocJar
+	published docJar
+}
+
+
+dependencies {
+	compile group: 'org.slf4j', name: 'slf4j-api', version:'1.+'
+	compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.+'
+	compile group: 'commons-io', name: 'commons-io', version:'2.+'
+	compile group: 'com.hazelcast', name: 'hazelcast-all', version: '3.+'
+	compile group: 'org.mongodb', name: 'mongo-java-driver', version: '2.+'
+	testCompile group: 'junit', name: 'junit', version:'4.+'
+	testCompile group: 'org.slf4j', name: 'slf4j-simple', version:'1.+'
 }
