@@ -12,13 +12,8 @@ import com.thedeanda.mongo.MongoWrapper;
 public abstract class CachedGenericDao<T extends PersistedObject> extends
 		GenericDao<T> {
 
-	private HazelcastInstance hazelcastInstance;
-
-	public CachedGenericDao(MongoWrapper mongoWrapprer,
-			HazelcastInstance hazelcastInstance) {
+	public CachedGenericDao(MongoWrapper mongoWrapprer) {
 		super(mongoWrapprer);
-
-		this.hazelcastInstance = hazelcastInstance;
 	}
 
 	public abstract String getCacheSuffix();
@@ -27,33 +22,9 @@ public abstract class CachedGenericDao<T extends PersistedObject> extends
 		return "cache_dao_" + part + "_" + getCacheSuffix();
 	}
 
-	private void clearAllCaches() {
-		String mapName = genMapKey("get");
-		Map<String, T> cache = hazelcastInstance.getMap(mapName);
-		cache.clear();
-
-		mapName = genMapKey("list");
-		Map<String, List<T>> listCache = hazelcastInstance.getMap(mapName);
-		listCache.clear();
-
-		mapName = genMapKey("count");
-		Map<String, Integer> countCache = hazelcastInstance.getMap(mapName);
-		countCache.clear();
-	}
-
-	private void removeFromCache(ObjectId id) {
-		String mapName = genMapKey("get");
-		Map<String, T> cache = hazelcastInstance.getMap(mapName);
-		cache.remove(id.toString());
-
-		mapName = genMapKey("list");
-		Map<String, List<T>> listCache = hazelcastInstance.getMap(mapName);
-		listCache.clear();
-
-		mapName = genMapKey("count");
-		Map<String, Integer> countCache = hazelcastInstance.getMap(mapName);
-		countCache.clear();
-	}
+	public abstract void clearAllCaches();
+	
+	public abstract void removeFromCache(ObjectId id);
 
 	public void delete(ObjectId id) {
 		super.delete(id);
