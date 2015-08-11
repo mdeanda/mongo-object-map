@@ -1,4 +1,4 @@
-package com.thedeanda.mongo.dao;
+package com.thedeanda.mongo.dbmigration;
 
 import java.io.IOException;
 import java.io.InputStream;

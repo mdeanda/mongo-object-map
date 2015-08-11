@@ -1,1 +1,1 @@
-include "serialize", "dao"
+include "serialize", "dao", "dbmigration"

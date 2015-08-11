@@ -1,0 +1,5 @@
+
+dependencies {
+	compile project(':serialize')
+	compile group: 'commons-io', name: 'commons-io', version:'2.+'
+}
