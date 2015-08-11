@@ -23,7 +23,7 @@ import com.mongodb.DBCollection;
  * 
  */
 public class DbMigration {
-	private static final ObjectId VERSION_ID = new ObjectId(0, 0, 0);
+	private static final ObjectId VERSION_ID = new ObjectId(0, 0, (short) 0, 0);
 	private static final String VERSION_FIELD = "version";
 	private static final String RESOURCE_EXTENSION = ".js";
 
