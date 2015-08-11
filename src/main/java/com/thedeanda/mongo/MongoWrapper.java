@@ -18,7 +18,7 @@ public class MongoWrapper {
 	private static final Logger log = LoggerFactory
 			.getLogger(MongoWrapper.class);
 
-	private Mongo mongo;
+	private MongoClient mongo;
 	private DB db;
 
 	private String servers;
@@ -44,8 +44,7 @@ public class MongoWrapper {
 		}
 
 		MongoClientOptions options = MongoClientOptions.builder()
-				.autoConnectRetry(true).connectTimeout(5000)
-				.socketTimeout(5000).build();
+				.connectTimeout(5000).socketTimeout(5000).build();
 
 		if (!sas.isEmpty()) {
 			this.mongo = new MongoClient(sas, options);
