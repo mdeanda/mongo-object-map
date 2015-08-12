@@ -14,9 +14,8 @@ public abstract class HazelcastCachedGenericDao<T extends PersistedObject> exten
 
 	private HazelcastInstance hazelcastInstance;
 
-	public HazelcastCachedGenericDao(MongoWrapper mongoWrapprer,
-			HazelcastInstance hazelcastInstance) {
-		super(mongoWrapprer);
+	public HazelcastCachedGenericDao(HazelcastInstance hazelcastInstance) {
+		
 
 		this.hazelcastInstance = hazelcastInstance;
 	}
