@@ -58,7 +58,16 @@ public class MongoSerialize {
 					if (isSimpleClass(fldClass)) {
 						fld.set(toObject, convert(fldClass, value));
 					} else {
-						Object toObject2 = fldClass.newInstance();
+						// check if value is non-null first to reuse object and
+						// avoid "newinstance"
+						Object currentValue = fld.get(toObject);
+						Object toObject2 = null;
+						if (currentValue != null) {
+							// reuse object
+							toObject2 = currentValue;
+						} else {
+							toObject2 = fldClass.newInstance();
+						}
 						deserialize((BasicDBObject) value, toObject2);
 						fld.set(toObject, toObject2);
 					}
