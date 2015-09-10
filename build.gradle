@@ -23,7 +23,7 @@ subprojects {
 	apply plugin: 'findbugs'
 
 	group = 'com.thedeanda'
-	version = '2.0-SNAPSHOT'
+	version = '2.0'
 	description = "mongo-object-map"
 	archivesBaseName = rootProject.name + '-' + project.name
 	//version = parent.version
@@ -71,7 +71,7 @@ subprojects {
 	publishing {
 		publications {
 			maven(MavenPublication) {
-				artifactId "$parent.name}-${name}"
+				artifactId "${parent.name}-${name}"
 				from components.java
 
 			}
