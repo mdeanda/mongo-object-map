@@ -7,6 +7,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.thedeanda.mongo.MongoWrapper;
@@ -88,12 +89,12 @@ public class HazelcastCachedGenericDao<T extends PersistedObject> implements
 			return null;
 
 		String mapName = genMapKey(CACHE_SECTION.GET);
-		Map<String, T> cache = hazelcastInstance.getMap(mapName);
+		IMap<String, T> cache = hazelcastInstance.getMap(mapName);
 		T ret = cache.get(id);
 		if (ret == null) {
 			ret = dao.get(id);
 			if (ret != null)
-				cache.put(id, ret);
+				cache.set(id, ret);
 		}
 		return ret;
 	}
@@ -105,12 +106,12 @@ public class HazelcastCachedGenericDao<T extends PersistedObject> implements
 
 		String stringId = id.toString();
 		String mapName = genMapKey(CACHE_SECTION.GET);
-		Map<String, T> cache = hazelcastInstance.getMap(mapName);
+		IMap<String, T> cache = hazelcastInstance.getMap(mapName);
 		T ret = cache.get(stringId);
 		if (ret == null) {
 			ret = dao.get(id);
 			if (ret != null)
-				cache.put(stringId, ret);
+				cache.set(stringId, ret);
 		}
 		return ret;
 	}
@@ -122,12 +123,12 @@ public class HazelcastCachedGenericDao<T extends PersistedObject> implements
 
 		String mapName = genMapKey(CACHE_SECTION.GET);
 		String key = query == null ? "" : query.toString();
-		Map<String, T> cache = hazelcastInstance.getMap(mapName);
+		IMap<String, T> cache = hazelcastInstance.getMap(mapName);
 		T ret = cache.get(key);
 		if (ret == null) {
 			ret = dao.getOne(query);
 			if (ret != null)
-				cache.put(key, ret);
+				cache.set(key, ret);
 		}
 		return ret;
 	}
@@ -136,11 +137,11 @@ public class HazelcastCachedGenericDao<T extends PersistedObject> implements
 	public long count(BasicDBObject query) {
 		String mapName = genMapKey(CACHE_SECTION.COUNT);
 		String key = query == null ? "" : query.toString();
-		Map<String, Long> cache = hazelcastInstance.getMap(mapName);
+		IMap<String, Long> cache = hazelcastInstance.getMap(mapName);
 		Long ret = cache.get(key);
 		if (ret == null) {
 			ret = dao.count(query);
-			cache.put(key, ret);
+			cache.set(key, ret);
 		}
 		return ret;
 	}
@@ -149,11 +150,11 @@ public class HazelcastCachedGenericDao<T extends PersistedObject> implements
 	public List<T> list() {
 		String mapName = genMapKey(CACHE_SECTION.LIST);
 		String key = "";
-		Map<String, List<T>> cache = hazelcastInstance.getMap(mapName);
+		IMap<String, List<T>> cache = hazelcastInstance.getMap(mapName);
 		List<T> ret = cache.get(key);
 		if (ret == null) {
 			ret = dao.list();
-			cache.put(key, ret);
+			cache.set(key, ret);
 		}
 		return ret;
 	}
@@ -165,11 +166,11 @@ public class HazelcastCachedGenericDao<T extends PersistedObject> implements
 		String key = (query == null ? "" : query.toString());
 		key += "_" + (sort == null ? "" : sort.toString());
 		key += String.format("_%d-%d", offset, count);
-		Map<String, List<T>> cache = hazelcastInstance.getMap(mapName);
+		IMap<String, List<T>> cache = hazelcastInstance.getMap(mapName);
 		List<T> ret = cache.get(key);
 		if (ret == null) {
 			ret = dao.list(query, sort, offset, count);
-			cache.put(key, ret);
+			cache.set(key, ret);
 		}
 		return ret;
 	}
