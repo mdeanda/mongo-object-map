@@ -7,6 +7,7 @@ import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
+import com.thedeanda.mongo.dao.model.PersistedObject;
 
 public interface GenericDao<T extends PersistedObject> {
 

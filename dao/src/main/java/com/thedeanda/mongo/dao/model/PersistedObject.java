@@ -1,4 +1,4 @@
-package com.thedeanda.mongo.dao;
+package com.thedeanda.mongo.dao.model;
 
 import java.io.Serializable;
 

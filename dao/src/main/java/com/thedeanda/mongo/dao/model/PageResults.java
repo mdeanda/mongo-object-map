@@ -3,7 +3,6 @@ package com.thedeanda.mongo.dao.model;
 import java.io.Serializable;
 import java.util.List;
 
-import com.thedeanda.mongo.dao.PersistedObject;
 
 public class PageResults<T extends PersistedObject> implements Serializable {
 	private static final long serialVersionUID = 558322401682939903L;

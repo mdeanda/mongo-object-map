@@ -15,6 +15,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.thedeanda.mongo.MongoWrapper;
 import com.thedeanda.mongo.dao.model.PageResults;
+import com.thedeanda.mongo.dao.model.PersistedObject;
 
 public abstract class AbstractGenericDao<T extends PersistedObject> implements
 		GenericDao<T> {
