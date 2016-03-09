@@ -10,50 +10,65 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.thedeanda.mongo.MongoWrapper;
+import com.thedeanda.mongo.dao.model.PageResults;
 
-public abstract class GenericDaoImpl<T extends PersistedObject> implements GenericDao<T> {
-	public static final Logger log = LoggerFactory.getLogger(GenericDaoImpl.class);
+public abstract class AbstractGenericDao<T extends PersistedObject> implements
+		GenericDao<T> {
+	public static final Logger log = LoggerFactory
+			.getLogger(AbstractGenericDao.class);
 
 	protected MongoClient mongo;
 
 	private String database;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.thedeanda.mongo.dao.IGenericDao#getCollectionName()
 	 */
 	@Override
 	public abstract String getCollectionName();
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.thedeanda.mongo.dao.IGenericDao#initCollection()
 	 */
 	@Override
 	public abstract void initCollection();
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.thedeanda.mongo.dao.IGenericDao#deserialize(org.bson.Document)
 	 */
 	@Override
 	public abstract T deserialize(Document o);
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.thedeanda.mongo.dao.IGenericDao#serialize(T)
 	 */
 	@Override
 	public abstract Document serialize(T t);
 
-	public GenericDaoImpl(MongoClient mongo, String database) {
+	public AbstractGenericDao(MongoClient mongo, String database) {
 		this.mongo = mongo;
 		this.database = database;
 	}
 
-	/* (non-Javadoc)
+	public AbstractGenericDao(MongoWrapper mongoWrapper) {
+		this(mongoWrapper.getMongoClient(), mongoWrapper.getDbName());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.thedeanda.mongo.dao.IGenericDao#init()
 	 */
 	@Override
@@ -65,7 +80,9 @@ public abstract class GenericDaoImpl<T extends PersistedObject> implements Gener
 		initCollection();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.thedeanda.mongo.dao.IGenericDao#getCollection()
 	 */
 	@Override
@@ -73,7 +90,9 @@ public abstract class GenericDaoImpl<T extends PersistedObject> implements Gener
 		return mongo.getDatabase(database).getCollection(getCollectionName());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.thedeanda.mongo.dao.IGenericDao#delete(org.bson.types.ObjectId)
 	 */
 	@Override
@@ -83,15 +102,20 @@ public abstract class GenericDaoImpl<T extends PersistedObject> implements Gener
 		getCollection().deleteOne(json);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.thedeanda.mongo.dao.IGenericDao#delete(com.mongodb.BasicDBObject)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.thedeanda.mongo.dao.IGenericDao#delete(com.mongodb.BasicDBObject)
 	 */
 	@Override
 	public void delete(BasicDBObject qry) {
 		getCollection().deleteMany(qry);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.thedeanda.mongo.dao.IGenericDao#get(java.lang.String)
 	 */
 	@Override
@@ -109,7 +133,9 @@ public abstract class GenericDaoImpl<T extends PersistedObject> implements Gener
 			return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.thedeanda.mongo.dao.IGenericDao#get(org.bson.types.ObjectId)
 	 */
 	@Override
@@ -119,8 +145,11 @@ public abstract class GenericDaoImpl<T extends PersistedObject> implements Gener
 		return getOne(query);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.thedeanda.mongo.dao.IGenericDao#getOne(com.mongodb.BasicDBObject)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.thedeanda.mongo.dao.IGenericDao#getOne(com.mongodb.BasicDBObject)
 	 */
 	@Override
 	public T getOne(BasicDBObject query) {
@@ -132,7 +161,9 @@ public abstract class GenericDaoImpl<T extends PersistedObject> implements Gener
 		return ret;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.thedeanda.mongo.dao.IGenericDao#count(com.mongodb.BasicDBObject)
 	 */
 	@Override
@@ -146,7 +177,9 @@ public abstract class GenericDaoImpl<T extends PersistedObject> implements Gener
 		return getCollection().count(json);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.thedeanda.mongo.dao.IGenericDao#list()
 	 */
 	@Override
@@ -154,8 +187,11 @@ public abstract class GenericDaoImpl<T extends PersistedObject> implements Gener
 		return list(null, null, 0, 100);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.thedeanda.mongo.dao.IGenericDao#list(com.mongodb.BasicDBObject, com.mongodb.BasicDBObject, int, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.thedeanda.mongo.dao.IGenericDao#list(com.mongodb.BasicDBObject,
+	 * com.mongodb.BasicDBObject, int, int)
 	 */
 	@Override
 	public List<T> list(BasicDBObject query, BasicDBObject sort, int offset,
@@ -187,7 +223,50 @@ public abstract class GenericDaoImpl<T extends PersistedObject> implements Gener
 		return ret;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.thedeanda.mongo.dao.IGenericDao#list(com.mongodb.BasicDBObject,
+	 * com.mongodb.BasicDBObject, int, int)
+	 */
+	// @Override
+	public PageResults<T> find(BasicDBObject query, BasicDBObject sort,
+			int offset, int count) {
+		List<T> ret = new ArrayList<>();
+
+		BasicDBObject json = null;
+		if (query != null)
+			json = query;
+		else
+			json = new BasicDBObject();
+
+		long total = count(query);
+
+		FindIterable<Document> obj = getCollection().find(json);
+		if (sort != null) {
+			obj = obj.sort(sort);
+		}
+		if (offset > 0) {
+			obj.skip(offset);
+		}
+		obj.batchSize(count);
+		for (Document doc : obj) {
+			T u = deserialize(doc);
+			ret.add(u);
+			count--;
+			if (count <= 0)
+				break;
+		}
+
+		count = ret.size();
+		boolean last = offset + count >= total;
+		boolean first = (offset <= 0);
+		return new PageResults<T>(ret, offset, count, total, first, last);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.thedeanda.mongo.dao.IGenericDao#save(T)
 	 */
 	@Override

@@ -18,7 +18,7 @@ public class MongoWrapper {
 	private static final Logger log = LoggerFactory
 			.getLogger(MongoWrapper.class);
 
-	private MongoClient mongo;
+	private MongoClient mongoClient;
 	private DB db;
 
 	private String servers;
@@ -47,9 +47,9 @@ public class MongoWrapper {
 				.connectTimeout(5000).socketTimeout(5000).build();
 
 		if (!sas.isEmpty()) {
-			this.mongo = new MongoClient(sas, options);
-			mongo.setReadPreference(ReadPreference.secondaryPreferred());
-			db = mongo.getDB(dbName);
+			this.mongoClient = new MongoClient(sas, options);
+			mongoClient.setReadPreference(ReadPreference.secondaryPreferred());
+			db = mongoClient.getDB(dbName);
 		} else {
 			log.warn("mongo not configured, no db connection available");
 		}
@@ -76,7 +76,11 @@ public class MongoWrapper {
 	}
 
 	public Mongo getMongo() {
-		return mongo;
+		return mongoClient;
+	}
+
+	public MongoClient getMongoClient() {
+		return mongoClient;
 	};
 
 }
