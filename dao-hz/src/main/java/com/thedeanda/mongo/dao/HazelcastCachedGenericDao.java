@@ -1,7 +1,6 @@
 package com.thedeanda.mongo.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -10,7 +9,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
-import com.thedeanda.mongo.MongoWrapper;
+import com.thedeanda.mongo.dao.model.PersistedObject;
 
 public class HazelcastCachedGenericDao<T extends PersistedObject> implements
 		GenericDao<T> {
