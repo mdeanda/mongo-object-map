@@ -23,7 +23,7 @@ subprojects {
 	apply plugin: 'findbugs'
 
 	group = 'com.thedeanda.mongo-object-map'
-	version = '2.1'
+	version = '2.2-SNAPSHOT'
 	description = "mongo-object-map"
 	archivesBaseName = rootProject.name + '-' + project.name
 	//version = parent.version
